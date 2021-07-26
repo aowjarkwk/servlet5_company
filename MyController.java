@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 
 
+
 @WebServlet(urlPatterns= {"/", "*.do"})
 public class MyController extends HttpServlet{
 
@@ -258,10 +259,79 @@ public class MyController extends HttpServlet{
 	else if(command.equals("qnaWrite")) {
 		RequestDispatcher dp = request.getRequestDispatcher("/customer/qnaWrite.jsp");
 		dp.forward(request, response);
-	}else if(command.equals("qnapw")) {
+	}
+	else if(command.equals("qnapw")) {
+		String qna_idx = (String)request.getParameter("qna_idx");
+		
+		qnaDto dto3 = null;
+		
+		try {
+			dto3 = qnaDao.Info(qna_idx);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		request.setAttribute("dto3", dto3);
+		
 		RequestDispatcher dp = request.getRequestDispatcher("/customer/qnapw.jsp");
 		dp.forward(request, response);
-	}
-	}
+	}else if(command.equals("pwConfirm")) {
+		String qna_idx = request.getParameter("qna_idx");
+		try {
+			if(qnaDao.pwConfirm(request)==1) {
+				response.sendRedirect("qnaWrong"); //맞음
+			}else {
+				response.sendRedirect("qnadetail?qna_idx="+qna_idx);//틀림
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}else if(command.equals("qnaWrong")) {
+		RequestDispatcher dp = request.getRequestDispatcher("/customer/qnaWrong.jsp");
+		dp.forward(request, response);
+	}else if(command.equals("update")) {
+		request.setCharacterEncoding("utf-8");
+		//아이디,이름으로 로그인 처리를 해줌.
+		String qna_idx = (String)request.getParameter("qna_idx");
+		int result = 0;//1 : 로그인 성공, 0:아이디가 없음 , 2:이름없음
+		System.out.println("qna_idx:"+qna_idx);
+		try {
+			result = qnaDao.Update(request);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(result == 1) { //성공
+			response.sendRedirect("qna");
+		}else if(result ==0 ||result==2) { //실패
+			
+			response.sendRedirect("qnadetail?qna_idx="+qna_idx);
+			System.out.println("qna_idx:"+qna_idx);
+		}
+			}else if(command.equals("deleteAction")) {
+				request.setCharacterEncoding("utf-8");
+				//아이디,이름으로 로그인 처리를 해줌.
+				String qna_idx = (String)request.getParameter("qna_idx");
+				int result1 = 0;//1 : 로그인 성공, 0:아이디가 없음 , 2:이름없음
+				System.out.println("qna_idx123:"+qna_idx);
+				result1 = qnaDao.deleteAction(request);
+				
+				if(result1 == 1) { //성공
+					response.sendRedirect("qna");
+				}else if(result1 ==0 ||result1==2) { //실패
+					
+					response.sendRedirect("qnadetail?qna_idx="+qna_idx);
+					System.out.println("qna_idx:"+qna_idx);
+		
+		}
+		}
+	
+	
+	
 }
+}
+
 
